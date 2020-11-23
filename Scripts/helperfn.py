@@ -1,5 +1,6 @@
 import pandas as pd
 import glob
+import re
 
 
 def merge_datasets(folder_path):
@@ -23,3 +24,11 @@ def merge_datasets(folder_path):
 
 def get_data(df):
     return df['review'], df['score']
+
+
+def remove_punctuations(string):
+    return re.sub('\!\!+', '!', string)
+
+#lower case tokens
+def lower_token(token): 
+    return [w.lower() for w in token]  
