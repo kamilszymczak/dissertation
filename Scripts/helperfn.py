@@ -20,3 +20,6 @@ def merge_datasets(folder_path):
         li.append(df)
 
     return pd.concat(li, axis=0, ignore_index=True)
+
+def get_data(df):
+    return df['review'], df['score']
