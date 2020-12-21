@@ -32,3 +32,11 @@ def remove_punctuations(string):
 #lower case tokens
 def lower_token(token): 
     return [w.lower() for w in token]  
+
+def vectorize(review):
+    for word in review:
+        if word in vocab:
+            vectors.append(model[word])
+        else:
+            pass
+            #word not in pre-trained ebeddings
