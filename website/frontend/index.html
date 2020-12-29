@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-  <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet"> -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.9/vue-router.min.js"></script>
 
@@ -15,26 +16,65 @@
 
 <body>
     <div id="app">
+
+        <div id="search">
+            <input type="text" class="search_query" placeholder="What university are you looking for?">
+            <button type="submit" class="search_button">Search</button>
+
+        </div>
+
+        <div class="title">Overall Satisfaction</div>
+        <div id="stats">
+            <div class="percentage">{{ percentage }}</div>
+            <div class="bar-container">
+                <div class="bar pos"></div>
+            </div>
+
+            <div class="numbers">
+                <div class="positive">{{ stats.positive_num }} positive</div>
+                <div class="negative">{{ stats.negative_num }} negative</div>
+            </div>
+
+        </div>
+
+        <div id="tweets_list">
+
+            <div class="tweet_cell">
+                <div class="tweet_content"></div>
+                <div class="tweet_sentiment"></div>
+            </div>
+
+        </div>
  
-    
     </div>
-  
-  
+
     <script>
       var app = new Vue({
         el: '#app',
         data: {
-
+            stats: {'positive_num': 11, 'negative_num': 12},
+            reviews: []
         },
   
         created(){
           console.log("hello world");
         },
   
-        methods: {
-  
+        methods: { 
 
   
+        },
+
+        computed: {
+            percentage() {
+                if (this.stats.positive_num > this.stats.negative_num) {
+                    return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(3).toString() + "% Positive";
+                }
+                else {
+                    return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(3).toString() + "% Negative";
+                }
+
+            }
         }
   
       })
@@ -44,6 +84,75 @@
 </body>
 
 <style>
+    #app{
+        font-family: 'Open Sans', sans-serif;
+        width: 600px;
+        margin: 0 auto;
+    }
+
+    #search{
+        height: 32px;
+        text-align: center;
+    }
+
+
+    .search_query{
+        width: calc(100% - 135px);
+        height: 100%;
+        margin-right: 8px;
+    }
+
+    .search_button{
+        width: 122px;
+        height: 100%;
+    }
+
+    .title{
+        margin-top: 25px;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    #stats{
+        width: 100%;
+        height: 140px;
+        margin: 0 auto;
+        border-radius: 9px;
+        background-color: #F6F6F6;
+    }
+
+    #stats .percentage{
+        text-align: center;
+        padding-top: 10px;
+        font-weight: 600;
+    }
+
+    #stats .bar-container{
+        height: 26px;
+        width: 270px;
+        background-color: #ddd;
+        margin: 0 auto;
+    }
+
+    .pos{
+        height: 100%;
+        width: 80%;
+        background-color: #A9FDAC;
+    }
+
+    .numbers{
+        width: 270px;
+        margin: 0 auto;
+    }
+
+    .positive{
+        float: left;
+    }
+
+    .negative{
+        float: right;
+    }
+
 
 </style>
 
