@@ -24,7 +24,7 @@
         </div>
 
         <div class="title">Overall Satisfaction</div>
-        <div id="stats">
+        <div class="stats">
             <div class="percentage">{{ percentage }}</div>
             <div class="bar-container">
                 <div class="bar pos"></div>
@@ -37,11 +37,12 @@
 
         </div>
 
+        <div class="title">Tweets Found</div>
         <div id="tweets_list">
 
-            <div class="tweet_cell">
-                <div class="tweet_content"></div>
-                <div class="tweet_sentiment"></div>
+            <div class="tweet_cell stats">
+                <div class="tweet_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident</div>
+                <div class="tweet_sentiment">87% Positive</div>
             </div>
 
         </div>
@@ -113,25 +114,26 @@
         font-weight: 600;
     }
 
-    #stats{
+    .stats{
         width: 100%;
-        height: 140px;
+        /* height: 140px; */
         margin: 0 auto;
         border-radius: 9px;
         background-color: #F6F6F6;
+        overflow: hidden;
     }
 
-    #stats .percentage{
+    .stats .percentage{
         text-align: center;
         padding-top: 10px;
         font-weight: 600;
     }
 
-    #stats .bar-container{
+    .stats .bar-container{
         height: 26px;
         width: 270px;
         background-color: #ddd;
-        margin: 0 auto;
+        margin: 3px auto;
     }
 
     .pos{
@@ -143,6 +145,8 @@
     .numbers{
         width: 270px;
         margin: 0 auto;
+        display: flow-root;
+        padding-bottom: 10px;
     }
 
     .positive{
@@ -151,6 +155,11 @@
 
     .negative{
         float: right;
+    }
+
+    .tweet_content{
+        padding: 10px;
+        text-align: justify;
     }
 
 
