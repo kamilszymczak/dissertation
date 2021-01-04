@@ -40,3 +40,20 @@ def vectorize(review):
         else:
             pass
             #word not in pre-trained ebeddings
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def balance_dataset(df):
+    # Shuffle the dataset
+    shuffled_df = df.sample(frac=1, random_state=14)
+
+    # Put all negative reviews/class in a separate dataset.
+    negative_df = shuffled_df.loc[shuffled_df['score'] == 0]
+
+    #Randomly select 108 postive reviews (majority class), as there are 108 negative reviews
+    positive_df = shuffled_df.loc[shuffled_df['score'] == 1].sample(n=negative_df.shape[0])
+
+    # Concatenate both dataframes again
+    return pd.concat([negative_df, positive_df])
