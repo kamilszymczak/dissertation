@@ -40,9 +40,9 @@
         <div class="title">Tweets Found</div>
         <div id="tweets_list">
 
-            <div class="tweet_cell stats">
-                <div class="tweet_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident</div>
-                <div class="tweet_sentiment">87% Positive</div>
+            <div class="tweet_cell stats" v-for="review in reviews">
+                <div class="tweet_content">{{ review.tweet }}</div>
+                <div class="tweet_sentiment">{{ review.sentiment }}</div>
             </div>
 
         </div>
@@ -54,7 +54,11 @@
         el: '#app',
         data: {
             stats: {'positive_num': 11, 'negative_num': 12},
-            reviews: []
+            reviews: [
+                {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': '87% Positive'},
+                {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': '22% Negative'}
+
+            ]
         },
   
         created(){
@@ -155,6 +159,10 @@
 
     .negative{
         float: right;
+    }
+
+    .tweet_cell{
+        margin-bottom: 20px;
     }
 
     .tweet_content{
