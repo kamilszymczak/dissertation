@@ -23,28 +23,27 @@
 
         </div>
 
-        <div class="title">Overall Satisfaction</div>
-        <div class="stats">
-            <div class="percentage">{{ percentage }}</div>
-            <div class="bar-container">
-                <div class="bar pos"></div>
+        <div v-if='reviews'> <!--Only display this UI when tweets present-->
+            <div class="title">Overall Satisfaction</div>
+            <div class="stats">
+                <div class="percentage">{{ percentage }}</div>
+                <div class="bar-container">
+                    <div class="bar pos"></div>
+                </div>
+
+                <div class="numbers">
+                    <div class="positive">{{ stats.positive_num }} positive</div>
+                    <div class="negative">{{ stats.negative_num }} negative</div>
+                </div>
             </div>
 
-            <div class="numbers">
-                <div class="positive">{{ stats.positive_num }} positive</div>
-                <div class="negative">{{ stats.negative_num }} negative</div>
+            <div class="title">Tweets Found</div>
+            <div id="tweets_list">
+                <div class="tweet_cell stats" v-for="review in reviews">
+                    <div class="tweet_content">{{ review.tweet }}</div>
+                    <div class="tweet_sentiment">{{ review.sentiment }}</div>
+                </div>
             </div>
-
-        </div>
-
-        <div class="title">Tweets Found</div>
-        <div id="tweets_list">
-
-            <div class="tweet_cell stats" v-for="review in reviews">
-                <div class="tweet_content">{{ review.tweet }}</div>
-                <div class="tweet_sentiment">{{ review.sentiment }}</div>
-            </div>
-
         </div>
  
     </div>
@@ -55,10 +54,11 @@
         data: {
             stats: {'positive_num': 11, 'negative_num': 12},
             reviews: [
-                {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': '87% Positive'},
-                {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': '22% Negative'}
+                {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
+                {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': 0.22}
 
-            ]
+            ],
+
         },
   
         created(){
@@ -79,7 +79,20 @@
                     return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(3).toString() + "% Negative";
                 }
 
+            },
+
+            positiveReviews(){
+                return this.reviews.filter((review) => {
+                    return review.sentiment >= 0.50
+                }) 
+            },
+
+            negativeReviews(){
+                return this.reviews.filter((review) => {
+                    return review.sentiment < 0.50
+                }) 
             }
+            
         }
   
       })
