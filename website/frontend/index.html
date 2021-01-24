@@ -68,8 +68,27 @@
         },
   
         methods: { 
+            sendQuery(){
+                let params = new FormData();
+                params.append('input', this.input);
 
-  
+                axios.post('http://127.0.0.1:5000/getTweets', params).then(response => {
+                    console.log(response);
+                    // Succesful
+                    if (response.status === 200) {
+                        this.reviews = response.data;
+                    }
+                    })
+                    .catch((error) => {
+                        // No tweets found
+                        if (error.response.status === 404) {
+
+                        } else {
+                            console.log(error);
+                        }
+                });
+            }
+
         },
 
         computed: {
