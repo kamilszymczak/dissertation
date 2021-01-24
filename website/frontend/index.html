@@ -20,7 +20,7 @@
 
         <div id="search">
             <input type="text" class="search_query" name="input" v-model="input" placeholder="What university are you looking for?">
-            <button type="submit" class="search_button">Search</button>
+            <input type="submit" class="search_button" value="Search" v-on:click=sendQuery>
 
         </div>
 
