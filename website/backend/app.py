@@ -4,6 +4,11 @@ from keras.models import load_model
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+from tensorflow import keras
+import pickle as pk
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
@@ -21,35 +26,45 @@ api = tweepy.API(auth)
 
 
 # load ML model
-model = load_model('model.h5')
+import os
+print(os.getcwd())
+os.chdir('../../')
+print(os.getcwd())
+model = load_model('ml/model_exported.h5')
+# load tokenizer
+with open("ml/tokenizer_m1.pickle", 'rb') as handle:
+    tokenizer = pk.load(handle)
+print("ML Model Loaded")
 # summarize model
 # model.summary()
 
-def getTweets():
-    tweets_list = []
-    query = "glasgow university OR uni OR student OR studying -FC -filter:retweets -filter:links -filter:mentions"
+def getTweets(user_query):
+    query = user_query + " OR uni OR student OR studying -FC -filter:retweets -filter:links -filter:mentions"
 
     # Fetching tweets with parameters
-    results = api.search(q=query, lang="en", tweet_mode='extended', count=100)
+    results = api.search(q=query, lang="en", tweet_mode='extended', count=20)
 
     # loop through all tweets pulled
+    tweets_list = []
     for tweet in results:
-        row_list.append(tweet.full_text)
+        tweets_list.append(tweet.full_text)
     return tweets_list
 
-def getSentiment(tweets)
+
+def getSentiment(tweets):
     tweets_sequences = tokenizer.texts_to_sequences(tweets)
     padded = pad_sequences(tweets_sequences, maxlen=122)
-    sentiment = model.predict(padded)
+    sentiment = model.predict(padded).tolist()
 
-    return [{"review": tweets[i], "sentiment": sentiment[i]} for i in range(len(tweets))]
+    return [{"review": tweets[i], "sentiment": sentiment[i][0]} for i in range(len(tweets))]
 
 
-@app.route('/getTweets', methods=['POST'])
-def predict(tweets):
+@app.route('/', methods=['POST'])
+def predict():
     if request.method == "POST":
-        user_query = request.form['query']
-        tweets = getTweets()
+        user_query = request.form['input']
+        print(user_query)
+        tweets = getTweets(user_query)
 
-        sentiment = getSentiment(tweets)
-        return jsonify(sentiment), 200
+        output = getSentiment(tweets)
+        return jsonify(output), 200
