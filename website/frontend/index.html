@@ -40,9 +40,9 @@
 
             <div class="title">Tweets Found</div>
             <div id="tweets_list">
-                <div class="tweet_cell stats" v-for="review in reviews">
-                    <div class="tweet_content">{{ review.tweet }}</div>
-                    <div class="tweet_sentiment">{{ review.sentiment }}</div>
+                <div class="tweet_cell stats" v-for="item in reviews">
+                    <div class="tweet_content">{{ item.review }}</div>
+                    <div class="tweet_sentiment">{{ item.sentiment }}</div>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
                 let params = new FormData();
                 params.append('input', this.input);
 
-                axios.post('http://127.0.0.1:5000/getTweets', params).then(response => {
+                axios.post('http://127.0.0.1:5000/', params).then(response => {
                     console.log(response);
                     // Succesful
                     if (response.status === 200) {
