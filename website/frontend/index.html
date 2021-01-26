@@ -1,5 +1,4 @@
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +12,6 @@
 
   <title>Index</title>
 </head>
-
 
 <body>
     <div id="app">
@@ -54,7 +52,6 @@
         el: '#app',
         data: {
             input: '',
-            stats: {'positive_num': 11, 'negative_num': 12},
             reviews: [
                 {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
                 {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': 0.22}
@@ -94,12 +91,11 @@
         computed: {
             percentage() {
                 if (this.stats.positive_num > this.stats.negative_num) {
-                    return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(3).toString() + "% Positive";
+                    return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(1).toString() + "% Positive";
                 }
                 else {
-                    return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(3).toString() + "% Negative";
+                    return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(1).toString() + "% Negative";
                 }
-
             },
 
             positiveReviews(){
@@ -112,7 +108,11 @@
                 return this.reviews.filter((review) => {
                     return review.sentiment < 0.50
                 }) 
-            }
+            },
+
+            stats(){
+                return {'positive_num': this.positiveReviews.length, 'negative_num': this.negativeReviews.length}
+            },
             
         }
   
