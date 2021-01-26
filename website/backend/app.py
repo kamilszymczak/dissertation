@@ -3,6 +3,7 @@ from tweepy import OAuthHandler
 from keras.models import load_model
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import html
 
 from tensorflow import keras
 import pickle as pk
@@ -47,7 +48,8 @@ def getTweets(user_query):
     # loop through all tweets pulled
     tweets_list = []
     for tweet in results:
-        tweets_list.append(tweet.full_text)
+        #html.unescape to fix HTML esape e.g. &amp; to &
+        tweets_list.append(html.unescape(tweet.full_text))
     return tweets_list
 
 
