@@ -27,7 +27,7 @@
             <div class="stats">
                 <div class="percentage">{{ percentage }}</div>
                 <div class="bar-container">
-                    <div class="bar pos"></div>
+                    <div class="bar pos" v-bind:style="{ width: positiveBarWidth }"></div>
                 </div>
 
                 <div class="numbers">
@@ -119,6 +119,10 @@
                 }
             },
 
+            positiveBarWidth(){
+                return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(0).toString() + "%";
+            },
+
             positiveReviews(){
                 return this.reviews.filter((review) => {
                     return review.sentiment >= 0.50
@@ -197,7 +201,7 @@
 
     .pos{
         height: 100%;
-        width: 80%;
+        width: 0%;
         background-color: #A9FDAC;
     }
 
