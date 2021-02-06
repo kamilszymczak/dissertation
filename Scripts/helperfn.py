@@ -26,8 +26,8 @@ def get_data(df):
     return df['review'], df['score']
 
 
-def remove_punctuations(string):
-    return re.sub('\!\!+', '!', string)
+def remove_punctuations(token):
+    return [re.sub(r'(\[+|]+|\!+|"+|\$+|%+|&+|\'+|\(+|\)+|\*+|\++|,+|\.+|:+|;+|=+|#+|@+|\?+|\[+|\^+|_+|`+|{+|\|+|\}+|~+|-+|]+)\1+', r'\1', string) for string in token]
 
 #lower case tokens
 def lower_token(token): 
