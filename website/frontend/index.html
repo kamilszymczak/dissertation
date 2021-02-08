@@ -38,9 +38,9 @@
 
             <div class="title">Tweets Found ({{ reviews.length }})</div>
             <div id="tweets_list">
-                <div class="tweet_cell stats" v-for="item in reviews">
+                <div class="tweet_cell stats" v-for="item in reviews" :class="{ pos_border: item.sentiment >= 0.5, neg_border: item.sentiment < 0.5 }">
                     <div class="tweet_content">{{ item.review }}</div>
-                    <div class="tweet_sentiment">{{ item.sentiment }} {{ item.sentiment > 0.5 ? "Positive" : "Negative" }}</div>
+                    <div class="tweet_sentiment">{{ item.sentiment }} {{ item.sentiment >= 0.5 ? "Positive" : "Negative" }}</div>
                 </div>
             </div>
         </div>
@@ -237,6 +237,14 @@
 
     .tweet_cell{
         margin-bottom: 20px;
+    }
+
+    .pos_border{
+        border: 1px solid #A9FDAC;
+    }
+
+    .neg_border{
+        border: 1px solid #FF6879;
     }
 
     .tweet_content{
