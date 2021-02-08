@@ -124,13 +124,13 @@
             },
 
             positiveReviews(){
-                return this.reviews.filter((review) => {
+                return this.reviewsCopy.copy.filter((review) => {
                     return review.sentiment >= 0.50
                 }) 
             },
 
             negativeReviews(){
-                return this.reviews.filter((review) => {
+                return this.reviewsCopy.copy.filter((review) => {
                     return review.sentiment < 0.50
                 }) 
             },
