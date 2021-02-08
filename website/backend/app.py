@@ -1,14 +1,20 @@
 import tweepy
 from tweepy import OAuthHandler
-from keras.models import load_model
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import html
 
 from tensorflow import keras
 import pickle as pk
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+# from keras.preprocessing.text import Tokenizer
+# from keras.preprocessing.sequence import pad_sequences
+# from keras.models import load_model
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import os
+# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -43,7 +49,7 @@ def getTweets(user_query):
     query = user_query + " OR uni OR student OR studying -FC -filter:retweets -filter:links -filter:mentions"
 
     # Fetching tweets with parameters
-    results = api.search(q=query, lang="en", tweet_mode='extended', count=20)
+    results = api.search(q=query, lang="en", tweet_mode='extended', count=100)
 
     # loop through all tweets pulled
     tweets_list = []
@@ -55,7 +61,7 @@ def getTweets(user_query):
 
 def getSentiment(tweets):
     tweets_sequences = tokenizer.texts_to_sequences(tweets)
-    padded = pad_sequences(tweets_sequences, maxlen=122)
+    padded = pad_sequences(tweets_sequences, maxlen=137)
     sentiment = model.predict(padded).tolist()
 
     return [{"review": tweets[i], "sentiment": sentiment[i][0]} for i in range(len(tweets))]
