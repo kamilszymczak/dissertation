@@ -17,8 +17,8 @@
     <div id="app">
 
         <div id="search">
-            <input type="text" class="search_query" name="input" v-model="input" placeholder="What university are you looking for?">
-            <input type="submit" class="search_button" value="Search" v-on:click=sendQuery>
+            <input type="text" class="search_query" name="input" v-model="input" placeholder="What university or class are you looking for?">
+            <input type="submit" class="search_button" :value="reviews.length > 0 ? 'Search Again' : 'Search'" v-on:click=sendQuery>
 
         </div>
 
