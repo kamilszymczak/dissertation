@@ -1,7 +1,7 @@
 import pandas as pd
 import glob
 import re
-
+from nltk.corpus import stopwords
 
 def merge_datasets(folder_path):
     """Merging multiply csv datasets into one DataFrame
@@ -57,3 +57,23 @@ def balance_dataset(df):
 
     # Concatenate both dataframes again
     return pd.concat([negative_df, positive_df])
+
+
+def stop_words():
+    stop = stopwords.words('english')
+    #convert to set for faster retrival
+    stop = set(stop)
+    stop_to_remove = {'no', 'nor', 'not', 'very', 'don', "don't", "aren't", 'couldn', "couldn't", 'didn', "didn't",
+        'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't",
+        'isn', "isn't", 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't",
+        'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"}
+
+    #remove negations as stopwords as they provide valauble meaning and should not be removed
+    return stop.difference(stop_to_remove)
+
+def uni_names():
+    return {'anglia', 'ruskin', 'birmingham', 'brunel', 'buckinghamshire', 'cardiff', 'metropolitan',
+    'napier', 'heriot', 'watt', 'kingston', 'liverpool', 'metropolitan', 'south', 'middlesex', 'oxford',
+    'brookes', 'teesside', 'westminster', 'wolverhampton', 'suffolk', 'ltd', 'london', 'aberdeen',
+    'abertay', 'dundee', 'bedfordshire', 'cumbria', 'derby', 'east london', 'edinburgh', 'glasgow',
+    'northampton', 'salford', 'south', 'wales', 'stirling', 'strathclyde', 'sunderland', 'west', 'scotland', 'ulster', 'worcester'}
