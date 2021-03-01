@@ -33,13 +33,8 @@ def remove_punctuations(token):
 def lower_token(token): 
     return [w.lower() for w in token]  
 
-def vectorize(review):
-    for word in review:
-        if word in vocab:
-            vectors.append(model[word])
-        else:
-            pass
-            #word not in pre-trained ebeddings
+def remove_mentions(texts):
+    return [re.sub(r"(?:\@|https?\://)\S+", "", text) for text in texts]
 
 
 import matplotlib.pyplot as plt
