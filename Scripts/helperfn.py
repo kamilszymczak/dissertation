@@ -26,34 +26,6 @@ def get_data(df):
     return df['review'], df['score']
 
 
-def remove_punctuations(token):
-    return [re.sub(r'(\[+|]+|\!+|"+|\$+|%+|&+|\'+|\(+|\)+|\*+|\++|,+|\.+|:+|;+|=+|#+|@+|\?+|\[+|\^+|_+|`+|{+|\|+|\}+|~+|-+|]+)\1+', r'\1', string) for string in token]
-
-#lower case tokens
-def lower_token(token): 
-    return [w.lower() for w in token]  
-
-def remove_mentions(texts):
-    return [re.sub(r"(?:\@|https?\://)\S+", "", text) for text in texts]
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-def balance_dataset(df):
-    # Shuffle the dataset
-    shuffled_df = df.sample(frac=1, random_state=14)
-
-    # Put all negative reviews/class in a separate dataset.
-    negative_df = shuffled_df.loc[shuffled_df['score'] == 0]
-
-    #Randomly select 108 postive reviews (majority class), as there are 108 negative reviews
-    positive_df = shuffled_df.loc[shuffled_df['score'] == 1].sample(n=negative_df.shape[0])
-
-    # Concatenate both dataframes again
-    return pd.concat([negative_df, positive_df])
-
-
 def stop_words():
     stop = stopwords.words('english')
     #convert to set for faster retrival
@@ -72,3 +44,36 @@ def uni_names():
     'brookes', 'teesside', 'westminster', 'wolverhampton', 'suffolk', 'ltd', 'london', 'aberdeen',
     'abertay', 'dundee', 'bedfordshire', 'cumbria', 'derby', 'east london', 'edinburgh', 'glasgow',
     'northampton', 'salford', 'south', 'wales', 'stirling', 'strathclyde', 'sunderland', 'west', 'scotland', 'ulster', 'worcester'}
+
+
+def remove_punctuations(token):
+    return [re.sub(r'(\[+|]+|\!+|"+|\$+|%+|&+|\'+|\(+|\)+|\*+|\++|,+|\.+|:+|;+|=+|#+|@+|\?+|\[+|\^+|_+|`+|{+|\|+|\}+|~+|-+|]+)\1+', r'\1', string) for string in token]
+
+#lower case tokens
+def lower_token(token): 
+    return [w.lower() for w in token]  
+
+def remove_mentions(texts):
+    return [re.sub(r"(?:\@|https?\://)\S+", "", text) for text in texts]
+
+def remove_stopwords(text):
+    return [item for item in text if item not in stop_words()]
+
+def remove_uni_names(text):
+    return [item for item in text if item not in uni_names()]
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def balance_dataset(df):
+    # Shuffle the dataset
+    shuffled_df = df.sample(frac=1, random_state=14)
+
+    # Put all negative reviews/class in a separate dataset.
+    negative_df = shuffled_df.loc[shuffled_df['score'] == 0]
+
+    #Randomly select 108 postive reviews (majority class), as there are 108 negative reviews
+    positive_df = shuffled_df.loc[shuffled_df['score'] == 1].sample(n=negative_df.shape[0])
+
+    # Concatenate both dataframes again
+    return pd.concat([negative_df, positive_df])
