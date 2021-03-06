@@ -66,6 +66,12 @@ def getSentiment(tweets):
 
     return [{"review": tweets[i], "sentiment": sentiment[i][0]} for i in range(len(tweets))]
 
+def sentimentToString(pred):
+    rounded = round(pred)
+    if rounded == 0:
+        return "Negative"
+    else:
+        return "Positive"
 
 @app.route('/', methods=['POST'])
 def predict():
