@@ -22,7 +22,7 @@
 
         </div>
 
-        <div class="error_msg" v-if='errorMsg.startup'>
+        <div class="error_msg" v-if='reviews.length <= 0 && !errorMsg.noTweetsFound'>
             Student satisfaction level and<br>
             relevant tweets will show here<br>
             once <b>Search</b> button is pressed
