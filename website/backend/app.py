@@ -4,12 +4,10 @@ from tweepy import OAuthHandler
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import html
-
+import numpy as np
 from tensorflow import keras
 import pickle as pk
-# from keras.preprocessing.text import Tokenizer
-# from keras.preprocessing.sequence import pad_sequences
-# from keras.models import load_model
+
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -33,20 +31,23 @@ api = tweepy.API(auth)
 
 
 # load ML model
-import os
-print(os.getcwd())
-os.chdir('../../')
-print(os.getcwd())
-model = load_model('ml/model_exported.h5')
+model = load_model('../../ml/model_exported.h5')
 # load tokenizer
-with open("ml/tokenizer_m1.pickle", 'rb') as handle:
+with open("../../ml/tokenizer_m1.pickle", 'rb') as handle:
     tokenizer = pk.load(handle)
 print("ML Model Loaded")
-# summarize model
-# model.summary()
+
+from nltk.tokenize import RegexpTokenizer
+import re
+import sys 
+sys.path.append('E:\GitHubProjects\dissertation\Scripts')
+import helperfn as hf
+
+stop = hf.stop_words()
+uni_names = hf.uni_names()
 
 def getTweets(user_query):
-    query = user_query + " OR uni OR student OR studying -FC -filter:retweets -filter:links -filter:mentions"
+    query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
     results = api.search(q=query, lang="en", tweet_mode='extended', count=100)
@@ -55,16 +56,75 @@ def getTweets(user_query):
     tweets_list = []
     for tweet in results:
         #html.unescape to fix HTML esape e.g. &amp; to &
-        tweets_list.append(html.unescape(tweet.full_text))
+        unescape = html.unescape(tweet.full_text)
+        # removal of \n next line char replaced with space
+        tweets_list.append(re.sub(r"\n", " ", unescape))
     return tweets_list
 
 
 def getSentiment(tweets):
     tweets_sequences = tokenizer.texts_to_sequences(tweets)
     padded = pad_sequences(tweets_sequences, maxlen=137)
-    sentiment = model.predict(padded).tolist()
+    sentiment = model.predict(padded).flatten().tolist()
 
-    return [{"review": tweets[i], "sentiment": sentiment[i][0]} for i in range(len(tweets))]
+    # return [{"review": tweets[i], "sentiment": sentiment[i][0]} for i in range(len(tweets))]
+    return sentiment
+
+def cleanTweets(tweets):
+    tweets = hf.remove_mentions(tweets)
+
+    tokenizer = RegexpTokenizer(r'([\w\']+|\[+|]+|\!+|"+|\$+|%+|&+|\'+|\(+|\)+|\*+|\++|,+|\.+|:+|;+|=+|#+|@+|\?+|\[+|\^+|_+|`+|{+|\|+|\}+|~+|-+|]+)') 
+
+    tweets = [tokenizer.tokenize(x) for x in tweets]
+
+    # lower case
+    tweets = [hf.lower_token(x) for x in tweets]
+
+    # remove stop words
+    # tweets = [item for item in tweets if item not in stop]
+    tweets = [hf.remove_stopwords(x) for x in tweets]
+
+    # remove university names as they impact accuracy, these words should be neutral sentiment 
+    # tweets = [item for item in tweets if item not in uni_names]
+    tweets = [hf.remove_uni_names(x) for x in tweets]
+
+    # #reduce puncuations, remove duplicates next to each other and leave only one e.g. !!! to !
+    tweets = [hf.remove_punctuations(x) for x in tweets]
+    return tweets
+
+def cleanSingle(text):
+    # remove @ mentions or URL links
+    text = re.sub(r"(?:\@|https?\://)\S+", "", text)
+
+    tokenizer = RegexpTokenizer(r'([\w\']+|\[+|]+|\!+|"+|\$+|%+|&+|\'+|\(+|\)+|\*+|\++|,+|\.+|:+|;+|=+|#+|@+|\?+|\[+|\^+|_+|`+|{+|\|+|\}+|~+|-+|]+)') 
+
+    text = tokenizer.tokenize(text)
+
+    # lower case
+    text = hf.lower_token(text)
+
+    # remove stop words
+    text = [item for item in text if item not in stop]
+
+    # remove university names as they impact accuracy, these words should be neutral sentiment 
+    text = [item for item in text if item not in uni_names]
+
+    # reduce puncuations, remove duplicates next to each other and leave only one e.g. !!! to !
+    text = hf.remove_punctuations(text)
+    return text
+
+
+from nltk.tokenize import sent_tokenize, word_tokenize
+def sentimentSentence(tweets):
+    allTweets = []
+    for tweet in tweets:
+        sentences = sent_tokenize(tweet) 
+        sentencesClean = [cleanSingle(sentence) for sentence in sentences]    
+        tweetSentiment = getSentiment(sentencesClean)
+        singleTweet = [{"tweet": [{"sentence": sentences[i], "sentiment": tweetSentiment[i]} for i in range(len(sentences))]}]
+        allTweets.append(singleTweet)
+
+    return allTweets
 
 def sentimentToString(pred):
     rounded = round(pred)
@@ -77,8 +137,15 @@ def sentimentToString(pred):
 def predict():
     if request.method == "POST":
         user_query = request.form['input']
-        print(user_query)
         tweets = getTweets(user_query)
 
-        output = getSentiment(tweets)
+        #PREDICT EACH TWEET VERSION
+        cleaned = cleanTweets(tweets)
+        sentiment = getSentiment(cleaned)
+        tweets = hf.remove_mentions(tweets) 
+        output = [{"review": tweets[i], "sentiment": sentimentToString(sentiment[i])} for i in range(len(tweets))]
         return jsonify(output), 200
+
+        #PREDICT SENTENCES VERSION
+        # output = sentimentSentence(tweets)
+        # return jsonify(output), 200
