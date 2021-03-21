@@ -40,7 +40,8 @@ print("ML Model Loaded")
 from nltk.tokenize import RegexpTokenizer
 import re
 import sys 
-sys.path.append('E:\GitHubProjects\dissertation\Scripts')
+# sys.path.append('E:\GitHubProjects\dissertation\Scripts')
+sys.path.append('..\..\Scripts')
 import helperfn as hf
 
 stop = hf.stop_words()
@@ -142,7 +143,6 @@ def predict():
         #PREDICT EACH TWEET VERSION
         cleaned = cleanTweets(tweets)
         sentiment = getSentiment(cleaned)
-        tweets = hf.remove_mentions(tweets) 
         output = [{"review": tweets[i], "sentiment": sentimentToString(sentiment[i])} for i in range(len(tweets))]
         return jsonify(output), 200
 
