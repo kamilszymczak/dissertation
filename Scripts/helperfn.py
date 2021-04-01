@@ -2,6 +2,7 @@ import pandas as pd
 import glob
 import re
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 def merge_datasets(path):
     """Merging multiply csv datasets into one DataFrame
@@ -62,8 +63,9 @@ def remove_stopwords(text):
 def remove_uni_names(text):
     return [item for item in text if item not in uni_names()]
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+lemmatizer = WordNetLemmatizer()
+def lemmatization(text):
+    return [lemmatizer.lemmatize(item) for item in text]
 
 def balance_dataset(df):
     # Shuffle the dataset
