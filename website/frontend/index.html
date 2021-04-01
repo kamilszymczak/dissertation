@@ -15,7 +15,6 @@
 
 <body>
     <div id="app">
-
         <div id="search">
             <input type="text" class="search_query" name="input" v-model="input" placeholder="What university or class are you looking for?">
             <input type="submit" class="search_button" :value="reviews.length > 0 ? 'Search Again' : 'Search'" v-on:click=sendQuery>
@@ -45,14 +44,26 @@
             </div>
 
             <div class="title">Tweets Found ({{ reviews.length }})</div>
-            <div id="tweets_list">
-                <div class="tweet_cell stats" v-for="item in reviews" :class="{ pos_border: item.sentiment >= 0.5, neg_border: item.sentiment < 0.5 }">
+            <!-- <div id="tweets_list">
+                <div class="tweet_cell stats" v-for="item in reviews" :class="{ positive_border: item.sentiment >= 0.5, negative_border: item.sentiment < 0.5 }">
                     <div class="tweet_content">{{ item.review }}</div>
                     <div class="tweet_sentiment">{{ item.sentiment }} {{ item.sentiment >= 0.5 ? "Positive" : "Negative" }}</div>
                 </div>
+            </div> -->
+
+            <!-- PROTOTYPE RENDERING SENTIMENT OF INDIVIDUAL SENTENCES -->
+            <div id="tweets_list">
+                <div class="tweet_cell stats" v-for="item in reviews">
+                    <div class="tweet_content">
+                        <span v-for="sentence in item.tweet" :class="{ positive_highlight : sentence.sentence.length > 21 && sentence.sentiment >= 0.5, negative_highlight: sentence.sentence.length > 21 && sentence.sentiment < 0.5 }">{{ sentence.sentence + " " }}</span>
+                    </div>
+                    <div class="tweet_sentiment" :class="{ positive_border : item.sentiment >= 0.5, negative_border: item.sentiment < 0.5 }">{{ item.sentiment >= 0.5 ? "Tweet Sentiment: Positive" : "Tweet Sentiment: Negative" }}</div>
+                </div>
+                    <!--replace div with template tag-->
             </div>
+            </div>
+
         </div>
- 
     </div>
 
     <script>
@@ -60,16 +71,59 @@
         el: '#app',
         data: {
             input: '',
-            reviews: [
-                // {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
-                // {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': 0.22}
-            ],
+            // reviews: [
+            //     // {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
+            //     // {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': 0.22}
+            // ],
+                // reviews: [],
+            reviews: [{
+                "tweet": [{
+                    "sentence": "Toronto - York University Heights Neighborhood #newhome #gta #realestategta #torontohomestaging #torontorealtor #jwatsonhomeselementary #mississauga #luxuryrealestate #torontorealestate #apartmentliving",
+                    "sentiment": 0.9667232036590576
+                }]
+            },
+            {
+                "tweet": [{
+                    "sentence": "Toronto - York University Heights Neighborhood #realestateToronto #gta #realestategta #torontohomestaging #torontorealtor #torontorealtors #mississauga #torontostagers #torontorealestate #torontobestrealtor",
+                    "sentiment": 0.9667232036590576
+                }]
+            },
+            {
+                "tweet": [{
+                        "sentence": "New York City has been a 117-month experiment by Harvard University.",
+                        "sentiment": 0.9186094999313354
+                    },
+                    {
+                        "sentence": "Our study is now complete.",
+                        "sentiment": 0.6970025897026062
+                    },
+                    {
+                        "sentence": "Thank you for your time.",
+                        "sentiment": 0.9791181087493896
+                    }
+                ]
+            },
+            {
+                "tweet": [{
+                        "sentence": "Susan was a Math Professor from Rochester, New York.",
+                        "sentiment": 0.6374081969261169
+                    },
+                    {
+                        "sentence": "The O'Hara's were from Colorado, and England.",
+                        "sentiment": 0.5834998488426208
+                    },
+                    {
+                        "sentence": "Susan, and I dated after Mary Ellen MCFarland, and I ceased.",
+                        "sentiment": 0.15302905440330505
+                    }
+                ]
+            }
+        ],
             reviewsCopy: {"copy": [], "currentFilter": null},
-            errorMsg: {"startup": true, "noTweetsFound": false}
+            errorMsg: {"noTweetsFound": false}
         },
   
         created(){
-          console.log("hello world");
         },
   
         methods: { 
@@ -83,11 +137,16 @@
                     if (response.status === 200) {
                         this.reviews = response.data;
                         this.reviewsCopy.copy = response.data;
+                        if(this.reviews.length < 1){
+                            this.errorMsg.noTweetsFound = true;
+                        } else {
+                            this.errorMsg.noTweetsFound = false;
+                        }
                     }
                     })
                     .catch((error) => {
                         // No tweets found
-                        if (error.response.status === 404) {
+                        if (error) {
 
                         } else {
                             console.log(error);
@@ -159,7 +218,7 @@
 <style>
     #app{
         font-family: 'Open Sans', sans-serif;
-        width: 600px;
+        width: 620px;
         margin: 0 auto;
     }
 
@@ -188,7 +247,6 @@
 
     .stats{
         width: 100%;
-        /* height: 140px; */
         margin: 0 auto;
         border-radius: 9px;
         background-color: #F6F6F6;
@@ -243,22 +301,42 @@
         color: #FF6879;
     }
 
-
     .tweet_cell{
         margin-bottom: 20px;
-    }
-
-    .pos_border{
-        border: 1px solid #A9FDAC;
-    }
-
-    .neg_border{
-        border: 1px solid #FF6879;
+        position: relative;
     }
 
     .tweet_content{
         padding: 10px;
-        text-align: justify;
+        /* text-align: justify; */
+    }
+
+    .tweet_sentiment{
+        width: 100%;
+        padding-left: 10px;
+        background-color: F6F6F6;
+    }
+
+    .positive_border{
+        /* border: 1px solid #A9FDAC; */
+        background-color: #98E39B;
+    }
+
+    .negative_border{
+        /* border: 1px solid #FF6879; */
+        background-color: #E55D6D;
+    }
+
+    .sentence{
+        display: inline-block;
+    }
+
+    .positive_highlight{
+        background-color: #A9FDAC;
+    }
+
+    .negative_highlight{
+        background-color: #FF6879;
     }
 
     .error_msg{
