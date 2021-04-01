@@ -48,6 +48,9 @@ stop = hf.stop_words()
 uni_names = hf.uni_names()
 
 def getTweets(user_query):
+    # if user query contains "university" then remove
+    user_query = user_query.replace("university", "").strip()
+
     query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
@@ -122,7 +125,7 @@ def sentimentSentence(tweets):
         sentences = sent_tokenize(tweet) 
         sentencesClean = [cleanSingle(sentence) for sentence in sentences]    
         tweetSentiment = getSentiment(sentencesClean)
-        singleTweet = [{"tweet": [{"sentence": sentences[i], "sentiment": tweetSentiment[i]} for i in range(len(sentences))]}]
+        singleTweet = {"tweet": [{"sentence": sentences[i], "sentiment": tweetSentiment[i]} for i in range(len(sentences))], "sentiment": np.mean(tweetSentiment)}
         allTweets.append(singleTweet)
 
     return allTweets
@@ -141,11 +144,11 @@ def predict():
         tweets = getTweets(user_query)
 
         #PREDICT EACH TWEET VERSION
-        cleaned = cleanTweets(tweets)
-        sentiment = getSentiment(cleaned)
-        output = [{"review": tweets[i], "sentiment": sentimentToString(sentiment[i])} for i in range(len(tweets))]
-        return jsonify(output), 200
+        # cleaned = cleanTweets(tweets)
+        # sentiment = getSentiment(cleaned)
+        # output = [{"review": tweets[i], "sentiment": sentimentToString(sentiment[i])} for i in range(len(tweets))]
+        # return jsonify(output), 200
 
         #PREDICT SENTENCES VERSION
-        # output = sentimentSentence(tweets)
-        # return jsonify(output), 200
+        output = sentimentSentence(tweets)
+        return jsonify(output), 200
