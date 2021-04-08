@@ -31,30 +31,29 @@ api = tweepy.API(auth)
 
 
 # load ML model
-model = load_model('../../ml/model_exported.h5')
+model = load_model('../../ml/NgramNoLemma.h5')
 # load tokenizer
-with open("../../ml/tokenizer_m1.pickle", 'rb') as handle:
+with open("../../ml/tokenizer.pickle", 'rb') as handle:
     tokenizer = pk.load(handle)
 print("ML Model Loaded")
 
 from nltk.tokenize import RegexpTokenizer
 import re
 import sys 
-# sys.path.append('E:\GitHubProjects\dissertation\Scripts')
 sys.path.append('..\..\Scripts')
 import helperfn as hf
 
 stop = hf.stop_words()
 uni_names = hf.uni_names()
 
-def getTweets(user_query):
+def getTweets(user_query, maxTweetsToFetch):
     # if user query contains "university" then remove
     user_query = user_query.replace("university", "").strip()
 
     query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
-    results = api.search(q=query, lang="en", tweet_mode='extended', count=100)
+    results = api.search(q=query, lang="en", tweet_mode='extended', count=maxTweetsToFetch)
 
     # loop through all tweets pulled
     tweets_list = []
@@ -141,7 +140,8 @@ def sentimentToString(pred):
 def predict():
     if request.method == "POST":
         user_query = request.form['input']
-        tweets = getTweets(user_query)
+        maxTweetsToFetch = request.form['maxTweetsToFetch']
+        tweets = getTweets(user_query, maxTweetsToFetch)
 
         #PREDICT EACH TWEET VERSION
         # cleaned = cleanTweets(tweets)
