@@ -9,8 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.9/vue-router.min.js"></script>
-
-  <title>Index</title>
+  <title>Student Feedback Analyzer</title>
 </head>
 
 <body>
@@ -25,7 +24,9 @@
             <input type="number" name="max_tweets" v-model.number="maxTweetsToFetch" value="100" min="1" max="100">
         </div>
 
-        <div class="error_msg" v-if='reviews.length <= 0 && !errorMsg.noTweetsFound'>
+        <div class="error_msg" v-if='loadingBar'>Gathering student reviews from Twitter.<br>Please wait...</div>
+
+        <div class="error_msg" v-if='reviews.length <= 0 && !errorMsg.noTweetsFound && !loadingBar'>
             Student satisfaction level and<br>
             relevant tweets will show here<br>
             once <b>Search</b> button is pressed
@@ -76,57 +77,59 @@
         data: {
             input: '',
             maxTweetsToFetch: 100,
+            reviews: [],
             // reviews: [
             //     // {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
             //     // {'tweet': 'Hello fddfsfdsff ,fsdfds, dfsfd. krert tretr tre, ietjds', 'sentiment': 0.22}
             // ],
                 // reviews: [],
-            reviews: [{
-                "tweet": [{
-                    "sentence": "Toronto - York University Heights Neighborhood #newhome #gta #realestategta #torontohomestaging #torontorealtor #jwatsonhomeselementary #mississauga #luxuryrealestate #torontorealestate #apartmentliving",
-                    "sentiment": 0.9667232036590576
-                }]
-            },
-            {
-                "tweet": [{
-                    "sentence": "Toronto - York University Heights Neighborhood #realestateToronto #gta #realestategta #torontohomestaging #torontorealtor #torontorealtors #mississauga #torontostagers #torontorealestate #torontobestrealtor",
-                    "sentiment": 0.9667232036590576
-                }]
-            },
-            {
-                "tweet": [{
-                        "sentence": "New York City has been a 117-month experiment by Harvard University.",
-                        "sentiment": 0.9186094999313354
-                    },
-                    {
-                        "sentence": "Our study is now complete.",
-                        "sentiment": 0.6970025897026062
-                    },
-                    {
-                        "sentence": "Thank you for your time.",
-                        "sentiment": 0.9791181087493896
-                    }
-                ]
-            },
-            {
-                "tweet": [{
-                        "sentence": "Susan was a Math Professor from Rochester, New York.",
-                        "sentiment": 0.6374081969261169
-                    },
-                    {
-                        "sentence": "The O'Hara's were from Colorado, and England.",
-                        "sentiment": 0.5834998488426208
-                    },
-                    {
-                        "sentence": "Susan, and I dated after Mary Ellen MCFarland, and I ceased.",
-                        "sentiment": 0.15302905440330505
-                    }
-                ]
-            }
-        ],
+        //     reviews: [{
+        //         "tweet": [{
+        //             "sentence": "Toronto - York University Heights Neighborhood #newhome #gta #realestategta #torontohomestaging #torontorealtor #jwatsonhomeselementary #mississauga #luxuryrealestate #torontorealestate #apartmentliving",
+        //             "sentiment": 0.9667232036590576
+        //         }]
+        //     },
+        //     {
+        //         "tweet": [{
+        //             "sentence": "Toronto - York University Heights Neighborhood #realestateToronto #gta #realestategta #torontohomestaging #torontorealtor #torontorealtors #mississauga #torontostagers #torontorealestate #torontobestrealtor",
+        //             "sentiment": 0.9667232036590576
+        //         }]
+        //     },
+        //     {
+        //         "tweet": [{
+        //                 "sentence": "New York City has been a 117-month experiment by Harvard University.",
+        //                 "sentiment": 0.9186094999313354
+        //             },
+        //             {
+        //                 "sentence": "Our study is now complete.",
+        //                 "sentiment": 0.6970025897026062
+        //             },
+        //             {
+        //                 "sentence": "Thank you for your time.",
+        //                 "sentiment": 0.9791181087493896
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         "tweet": [{
+        //                 "sentence": "Susan was a Math Professor from Rochester, New York.",
+        //                 "sentiment": 0.6374081969261169
+        //             },
+        //             {
+        //                 "sentence": "The O'Hara's were from Colorado, and England.",
+        //                 "sentiment": 0.5834998488426208
+        //             },
+        //             {
+        //                 "sentence": "Susan, and I dated after Mary Ellen MCFarland, and I ceased.",
+        //                 "sentiment": 0.15302905440330505
+        //             }
+        //         ]
+        //     }
+        // ],
             reviewsCopy: {"copy": [], "currentFilter": null},
             errorMsg: {"noTweetsFound": false},
-            settingsHide: true
+            settingsHide: true,
+            loadingBar: false
         },
   
         created(){
@@ -134,6 +137,7 @@
   
         methods: { 
             sendQuery(){
+                this.loadingBar = true;
                 let params = new FormData();
                 params.append('input', this.input);
                 params.append('maxTweetsToFetch', this.maxTweetsToFetch);
@@ -141,6 +145,7 @@
                 axios.post('http://127.0.0.1:5000/', params).then(response => {
                     console.log(response);
                     // Succesful
+                    this.loadingBar = false;
                     if (response.status === 200) {
                         this.reviews = response.data;
                         this.reviewsCopy.copy = response.data;
@@ -152,10 +157,7 @@
                     }
                     })
                     .catch((error) => {
-                        // No tweets found
                         if (error) {
-
-                        } else {
                             console.log(error);
                         }
                 });
@@ -187,10 +189,10 @@
         computed: {
             percentage() {
                 if (this.stats.positive_num > this.stats.negative_num) {
-                    return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(1).toString() + "% Positive";
+                    return (100*this.stats.positive_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(0).toString() + "% Positive";
                 }
                 else {
-                    return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(1).toString() + "% Negative";
+                    return (100*this.stats.negative_num / (this.stats.positive_num + this.stats.negative_num)).toFixed(0).toString() + "% Negative";
                 }
             },
 
