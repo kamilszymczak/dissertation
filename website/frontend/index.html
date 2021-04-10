@@ -23,6 +23,9 @@
         <div class="setting stats" v-if="!settingsHide">Max Number of<br>Tweets to Gather
             <input type="number" name="max_tweets" v-model.number="maxTweetsToFetch" value="100" min="1" max="100">
         </div>
+        <div class="setting stats" v-if="!settingsHide">Collect Mentions
+            <input type="checkbox" name="mentions" v-model="collectMentions" >
+        </div>
 
         <div class="error_msg" v-if='loadingBar'>Gathering student reviews from Twitter.<br>Please wait...</div>
 
@@ -77,6 +80,7 @@
         data: {
             input: '',
             maxTweetsToFetch: 100,
+            collectMentions: false,
             reviews: [],
             // reviews: [
             //     // {'tweet': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident', 'sentiment': 0.87},
@@ -141,6 +145,7 @@
                 let params = new FormData();
                 params.append('input', this.input);
                 params.append('maxTweetsToFetch', this.maxTweetsToFetch);
+                params.append('mentions', this.collectMentions);
 
                 axios.post('http://127.0.0.1:5000/', params).then(response => {
                     console.log(response);
@@ -272,6 +277,10 @@
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
         position: absolute;
+        margin-left: 10px;
+    }
+
+    .setting input[type=checkbox]{
         margin-left: 10px;
     }
 
