@@ -53,7 +53,6 @@ def getTweets(user_query, maxTweetsToFetch, mentions):
     if mentions == "false":
         query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
     else:
-        print("Mentions ON")
         query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
