@@ -46,11 +46,15 @@ import helperfn as hf
 stop = hf.stop_words()
 uni_names = hf.uni_names()
 
-def getTweets(user_query, maxTweetsToFetch):
+def getTweets(user_query, maxTweetsToFetch, mentions):
     # if user query contains "university" then remove
     user_query = user_query.replace("university", "").strip()
 
-    query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
+    if mentions == "false":
+        query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
+    else:
+        print("Mentions ON")
+        query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
     results = api.search(q=query, lang="en", tweet_mode='extended', count=maxTweetsToFetch)
@@ -124,6 +128,9 @@ def sentimentSentence(tweets):
         sentences = sent_tokenize(tweet) 
         sentencesClean = [cleanSingle(sentence) for sentence in sentences]    
         tweetSentiment = getSentiment(sentencesClean)
+        # remove mentions to anonymize 
+        sentences = hf.remove_mentions(sentences)
+
         singleTweet = {"tweet": [{"sentence": sentences[i], "sentiment": tweetSentiment[i]} for i in range(len(sentences))], "sentiment": np.mean(tweetSentiment)}
         allTweets.append(singleTweet)
 
@@ -141,7 +148,8 @@ def predict():
     if request.method == "POST":
         user_query = request.form['input']
         maxTweetsToFetch = request.form['maxTweetsToFetch']
-        tweets = getTweets(user_query, maxTweetsToFetch)
+        mentions = request.form['mentions']
+        tweets = getTweets(user_query, maxTweetsToFetch, mentions)
 
         #PREDICT EACH TWEET VERSION
         # cleaned = cleanTweets(tweets)
