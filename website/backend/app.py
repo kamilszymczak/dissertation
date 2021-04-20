@@ -50,10 +50,14 @@ def getTweets(user_query, maxTweetsToFetch, mentions):
     # if user query contains "university" then remove
     user_query = user_query.replace("university", "").strip()
 
-    if mentions == "false":
-        query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
+    # if query starts with a hashtag 
+    if user_query[0] == '#':
+        query = user_query
     else:
-        query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links filter:mentions' % (user_query)
+        if mentions == "false":
+            query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links -filter:mentions' % (user_query)
+        else:
+            query = '%s (university OR uni OR studying OR student OR lecture OR lectures OR professor OR lecturer) -"FC" -filter:retweets -filter:links filter:mentions' % (user_query)
 
     # Fetching tweets with parameters
     results = api.search(q=query, lang="en", tweet_mode='extended', count=maxTweetsToFetch)
@@ -87,11 +91,9 @@ def cleanTweets(tweets):
     tweets = [hf.lower_token(x) for x in tweets]
 
     # remove stop words
-    # tweets = [item for item in tweets if item not in stop]
     tweets = [hf.remove_stopwords(x) for x in tweets]
 
     # remove university names as they impact accuracy, these words should be neutral sentiment 
-    # tweets = [item for item in tweets if item not in uni_names]
     tweets = [hf.remove_uni_names(x) for x in tweets]
 
     # #reduce puncuations, remove duplicates next to each other and leave only one e.g. !!! to !
